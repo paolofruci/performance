@@ -1,0 +1,44 @@
+
+
+- LISTA VM  [OK]
+	|
+	|__ VMName, PowerState, Badge, IP, vCPU, Memory (Mb), CPU Max %, MEM Max %, Disks Max (KBps), Net Max (KBps)  [OK]
+
+
+- click sul progetto con pagina con 
+	|
+	|__ - lista componenti  												[OK]
+	|
+	|__ - get-performance di tutti i componenti (per ultimo)				[ OK ]
+	|
+	|__ - edit nome progetto  show_project.php 								[OK] 
+			|
+			|__ continuare modifica nome progetto su file show_project.php 	[OK]
+			
+
+
+data start < date end 		[OK]
+data end < now 				[OK]
+data start > now - 31 		[OK]
+
+errore datatables [OK]
+
+delete progetto e componente [OK]
+
+#### FAI QUESTO ####
+pulsante schedule sul componente  [OK]
+	|
+	|__ - campo type ("Daily",Weekly, Monthly) 																			[OK]
+	 __ - campo send mail (checkbok) che attiva casella di testo indirizzo mail  										[OK]
+	 __ - lista schedulazioni per componente con tasto delete (campi da visualizzare: progetto,componente,type,email)  	[OK]
+
+
+Togliere CDN daterangepicker [OK]
+
+
+
+badge su sidebar con status 
+
+
+VALIDAZIONE VARI FORM 
+
