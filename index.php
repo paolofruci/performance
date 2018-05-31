@@ -2,6 +2,7 @@
     // include("db_connect.php");
     include("data.php") ;
     $mydb = new db();
+    
 ?>
 <html>
 <head>
