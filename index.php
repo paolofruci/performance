@@ -1,15 +1,22 @@
-<?php 
-    // include("db_connect.php");
-    include("data.php") ;
-    $mydb = new db();
+<?php
+session_start();
+
+if(!isset($_SESSION['user']['username'])) //non siamo loggati, pagina di login 
+	 header("Location: login.php");
+else
+	$_SESSION['user']['last_activity'] = time();
+
+include("data.php") ;
+$mydb = new db();
     
 ?>
 <html>
 <head>
 
     <link href="bootstrap-4.1.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/fontawesome-all.css" rel="stylesheet">
-    
+    <link href="fontawesome/css/fontawesome-all.min.css" rel="stylesheet">
+
+
     <link rel="stylesheet" type="text/css" href="css/dashboard.css">
     <link rel="stylesheet" href="open-iconic/font/css/open-iconic-bootstrap.css" >
     <link rel="stylesheet" href="dataTables/datatables.min.css" >
@@ -21,11 +28,16 @@
     <a class="navbar-brand col-sm-3 col-md-2 mr-0 link2main" href="homepage.php">
         <span class="oi oi-home"></span> LOTTOMATICA
     </a>
-    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+    <input class="form-control form-control-dark w-100 mr-2" type="text" placeholder="Search" aria-label="Search">
+    <span class="navbar-text text-nowrap">
+        <i class="fas fa-user"></i>
+        <!-- <?=$_SESSION['user']['userid']?> -->
+        <?=$_SESSION['user']['username']?>
+    </span>
     <ul class="navbar-nav px-3">
-    <li class="nav-item text-nowrap">
-        <a class="nav-link" href="#">Sign out</a>
-    </li>
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="logout.php">Sign out</a>
+        </li>
     </ul>
 </nav>
 

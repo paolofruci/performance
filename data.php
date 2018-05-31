@@ -1,5 +1,5 @@
 <?php
-
+  
 class db
 {
     // property declaration
@@ -330,6 +330,22 @@ class db
         }
 
     }
+
+    public function login($username,$password){
+        $q="SELECT * FROM utenti WHERE utente_name='$username' AND `password` = '$password' LIMIT 1";
+        $result = $this->db->query($q);
+	
+        if($result->num_rows > 0){
+            $row = $result->fetch_object() ;
+            return array(
+                    "utente_name" => $row->utente_name,
+                    "utente_id" => $row->utente_id 
+                    ) ;
+        }else{
+            return false;
+        }
+    }
+
 }
 
 ?>
