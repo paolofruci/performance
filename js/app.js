@@ -4,7 +4,8 @@
     // LOAD SIDEBAR 
     $(".sidebar").load("sidebar.php");
     
-    setInterval(function(){
+
+    function reloadSidebar(){
         var id_projectOpened = []
         $(".sidebar").find(".show[id*='prjCollapse']").each(function(){
             id_projectOpened.push($(this).attr("id"))
@@ -23,8 +24,10 @@
             if(id_compactive){
                 $("#"+id_compactive).addClass("active")
             }
-        }) // this will run after every 5 seconds
-    }, 10000); 
+        })
+    }
+
+    setInterval(reloadSidebar, 10000); 
     
     
     $("#main").load("homepage.php");
@@ -71,8 +74,11 @@
     })
 
     $(".save-prj-btn").off().click(function(){
-        $(this).unbind()
-        var querystring = $('#edit-prj-modal').find("form").serialize()
+        $("#form_save_project").submit()
+    })
+    $("#form_save_project").submit(function(e){
+        e.preventDefault()
+        var querystring = $(this).serialize()
         $.post("save_project.php",querystring ,function(data){
             if(!data.error){
                 $('#edit-prj-modal').modal("hide");
@@ -125,7 +131,7 @@
            alert("problemi con il recupero dei dati!")
         }
     })
-    
+     
     /* Click sul bottone "conferma Eliminazione" */
     $(".delete-prj-comp-btn").off().click( function(){
         var querystring = $('#delete-prj-comp-modal').find("form").serialize()
@@ -135,10 +141,9 @@
             if( !data.error )
             {
                 if( $("[name='action-function']").val() == 'deleteComponent' ) // se sto eliminando un componente
-                {
-                    $(".sidebar").load("sidebar.php", function(){  // ricarico la sidebar e ri-seleziono il progetto per refresh 
-                        $("body a.link2main#project" + projectid ).click()
-                    }); 
+                {   
+                    reloadSidebar()
+                    $("body a.link2main#project" + projectid ).click()
                 }  
                 else                // se sto eliminando un progetto
                 {
@@ -158,6 +163,127 @@
     })
     /* ##### // TRIGGER EVENTS ON SHOW AND HIDE DELETE PROJECT/COMPONENT CONFIRM MODAL */ 
 
-    
+    /* SHOW COMPONENT PAGE */
+        /* EVENTS ADDED ON LOAD COMPONENT PAGE  */
+        $(document).on("loadpage_show_component", function(event,component_id){
+            
+            // Attiva o disattiva casella email schedule con la checkbox 
+            $("input[name='schedule[checkemail]']").change( function() {
+                $("input[name='schedule[checkemailtext]']").attr('disabled',! $(this).is(":checked") ).focus()
+            })
+
+            // Reset dei campi del form Schedule
+            $("#scheduleModal").on('show.bs.modal', function (event) {
+                var modal = $(this)
+                modal.find("input[name='schedule[checkemail]']").prop("checked",false)
+                modal.find("input[name='schedule[checkemailtext]']").val("").attr('disabled',true )
+                modal.find("select[name='schedule[type]']").val("")
+            })
+
+            // funzione di compilazione tabella delle schedulazioni
+            function drawTableSchedule(id_component){
+                $(".table-schedule tbody").html('')
+                $.getJSON("get_json_schedule.php?id_component=" + id_component , function(data){
+                    if(data.length > 0){
+                        $.each(data,function(k,v){
+                            $("table.table-schedule tbody").append("<tr> \
+                                <td>"+v.type+"</td> \
+                                <td>"+v.email+"</td> \
+                                <td><a class='deleteschedule' href='#' data-id='"+v.id+"' ><span class='oi oi-trash'></span></a></td> \
+                            </tr>")
+                        })
+                    }else{
+                        $("table.table-schedule tbody").append("<tr> \
+                                <td colspan='5' class='table-warning'>Nessuna richiesta di performance Schedulata per questo componente</td> \
+                            </tr>")
+                    }
+                })
+            }
+
+            drawTableSchedule(component_id)
+
+            // Aggiunta di una schedulazione (Post su save_schedule.php)
+            $(".btn-save-schedule").click( function(event){
+                event.preventDefault()
+                if( $("select[name='schedule[type]']").val().length == 0 ){
+                    alert("Schedule Type required")
+                    $("select[name='schedule[type]']").focus()
+                }else{
+                    $.post( "save_schedule.php" ,
+                            { "schedule" : {
+                                    "type" : $("select[name='schedule[type]']").val(),
+                                    "componentid" : $("[name='schedule[componentid]']").val(),
+                                    "checkemailtext" : $("[name='schedule[checkemailtext]']").val()
+                                }
+                            }, 
+                            function(data){
+                                if(data=='OK'){ drawTableSchedule(component_id) }
+                                else{ alert(data) }
+                            }
+                    )
+                }
+            })
+
+            // Elimina una schedulazione
+            $(".table-schedule").on("click",".deleteschedule",function(event){
+                event.preventDefault()
+                var schedule_id = $(this).data("id")
+                $.post( "save_schedule.php", { "deleteSchedule": 1 , "id_schedule": schedule_id } , function(data){
+                    if(data=='OK'){ drawTableSchedule(component_id) }
+                    else{ alert(data) }
+                })
+            })
+
+
+        })
+    /*/SHOW COMPONENT PAGE */
+
+    /* EDIT COMPONENT PAGE */
+        $(document).on("loadpage_edit_component", function(event,project_id,component_id=null){
+            // Pulisco i reload a tempo
+            var interval;
+            clearInterval(interval);
+
+            $(".hasTooltip").tooltip();
+
+            // azione che rimuove una vm selezionata
+            $("#vmselected").on("click",".restore",function(e){
+                $(this).closest("tr").remove();
+            })
+            // azione che rimuove tutte le vms selezionate
+            $("#removeAllSeleted").click(function(){
+                $("#vmselected tbody tr").remove();
+            })
+
+            // SUBMIT form
+            $("#form_edit_component").submit(function(e) {
+                e.preventDefault(); 
+                var num_vms = parseInt($("[name='vm_id[]']").length) // controllo quante vm ho selezionato
+                var action = $(this).attr("action"); // the script where you handle the form input.
+                var postData = $(this).serialize()
+                if($("[name='componentName']").val().trim() == '' ){
+                    alert("Inserisci il nome del componente")
+                    $("[name='componentName']").focus()
+                    return false
+                }else{
+                    if(num_vms > 0){ // se ho selezionato almeno una vm
+                        $.post( action , postData , function( data ) {
+                            if(data.OK && !data.error){
+                                $( "#main" ).load( 'show_component.php?id=' + data.OK );
+                                reloadSidebar()
+                            }else{
+                                alert(data.error);
+                            }
+                            
+                        },"json");
+                    }else{ //se non ho selezionato nemmeno una vm
+                        alert("Devi selezionare almeno una VM!")
+                        return false
+                    }
+                }
+            })
+        })
+    /* /EDIT COMPONENT PAGE */
+
 
 })

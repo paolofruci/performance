@@ -17,15 +17,21 @@
     <thead>
         <tr>
             <th></th>
-            <!-- <th scope="col">Vcenter</th> -->
+            <th scope="col">Vcenter</th>
             <th scope="col">VMName</th>
             <th scope="col">IP</th>
+            <th scope="col">Project</th>
+            <th scope="col">Function</th>
+            <th scope="col">Env</th>
         </tr>
         <tr>
             <th></th>
-            <!-- <th class="filter" id="filter_vcenter"></th> -->
+            <th class="filter" id="filter_vcenter"></th>
             <th class="filter" id="filter_vmname"></th>
             <th class="filter" id="filter_ip"></th>
+            <th class="filter" id="filter_project"></th>
+            <th class="filter" id="filter_functionality"></th>
+            <th class="filter" id="filter_env"></th>
         </tr>
     </thead>
 </table>
@@ -58,13 +64,13 @@ var table = $('#vmsTable').DataTable( {
                     },
         
         columns     : [
-                        {   
-                            "data" : "vm_id"  ,
-                            "visible" : false
-                        },
-                        // { "data": "vcenter" , name : "vcenter"},
+                        { "data" : "vm_id"  , "visible" : false },
+                        { "data": "vcenter" , name : "vcenter"  },
                         { "data": "vmname"  , name : "vmname" ,  className : "vmname" },
                         { "data": "ip" , name : "ip" },
+                        { "data": "project" , name : "project" },
+                        { "data": "functionality" , name : "functionality" },
+                        { "data": "env" , "visible" : false },
                     ],
         rowId : "vm_id",
         rowCallback : function( row, data ) {

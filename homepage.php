@@ -1,29 +1,31 @@
 <?php 
     include("data.php") ;
     $mydb = new db();
+    session_start();
+
 ?>
-<div class="d-flex align-items-start align-items-stretch">
+<!-- <div class="d-flex align-items-start align-items-stretch">
     <h4>Lista Progetti</h4>
-</div>
-<hr/>
+</div> -->
+<!-- <hr/> -->
 <div class="d-flex flex-wrap">
     
-    <?php foreach ($mydb->getProgetti() as $key => $value) :
+    <?php foreach ($mydb->getProgetti($_SESSION['user']['userid']) as $key => $value) :
             $nVm = count(explode(',',$mydb->getVM4Project($value['progetto_id']))) ;
     ?>
     <div class="p-2 item-container" style="position:relative">
         <a href="show_project.php?id_project=<?=$value['progetto_id']?>" 
             class="btn btn-light m-2 p-2 link2main
             <?php 
-                    if($value['status'] == "warning") 
+                    if($value['status'] == "1") 
                         echo "btn-outline-warning" ;
-                    else if ($value['status'] == "critical") 
+                    else if ($value['status'] == "2") 
                         echo "btn-outline-danger"  ;   
                 ?> 
             ">
             <h5><?=$value['progetto_nome']?></h5>
-            <small><?=count($value['componenti'])?> Componenti</small> <br>
-            <small><?=$nVm?> VMs</small>
+            <small>Componenti <?=count($value['componenti'])?> </small> <br>
+            <small>Virtual Machines <?=$nVm?> </small>
         </a>
         <a href="#" 
                 title="rimuovi questo progetto"

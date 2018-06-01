@@ -39,10 +39,11 @@ if( isset($_GET['exclude']) && is_array($_GET['exclude']) && count($_GET['exclud
 $columns = array(
     array( 'db' => 'vm_id', 'dt' => 'vm_id' ),
     array( 'db' => 'vmname', 'dt' => 'vmname' ),
-    // array( 'db' => 'vcenter',  'dt' => 'vcenter' ),
-    array( 'db' => 'ip',  'dt' => 'ip' )
-    // array( 'db' => 'position',   'dt' => 2 ),
-    // array( 'db' => 'office',     'dt' => 3 ),
+    array( 'db' => 'vcenter',  'dt' => 'vcenter' ),
+    array( 'db' => 'ip',  'dt' => 'ip' ),
+    array( 'db' => 'project',   'dt' => 'project' ),
+    array( 'db' => 'functionality',     'dt' =>'functionality' ),
+    array( 'db' => 'env',     'dt' =>'env' )
     // array(
     //     'db'        => 'start_date',
     //     'dt'        => 4,

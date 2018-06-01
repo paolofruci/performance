@@ -2,7 +2,10 @@
     include("data.php");
     $mydb = new db();    
     if(isset($_GET['component_id'])){
+        $component_id=$_GET['component_id'];
         $component = $mydb->getComponent($_GET['component_id']);
+    }else{
+        $component_id='null';
     }
 ?>
 <style>
@@ -17,7 +20,7 @@
     }
 </style>
 
-<form class="form" id="add_task" action="save_item.php">
+<form class="form" id="form_edit_component" action="save_component.php">
 
     <input type="hidden" name="project_id" value="<?=$_GET['project_id']?>" />
     <?php if( isset($_GET['component_id']) && $_GET['component_id'] != NULL ) : ?>
@@ -91,45 +94,45 @@
     </div>
 </form>
 <script>
-  
-        var interval;
-        clearInterval(interval);
+        $(document).trigger("loadpage_edit_component" , [ <?=$_GET['project_id']?> , <?=$component_id?>] );
 
-        $(".hasTooltip").tooltip();
 
-        $("#vmselected").on("click",".restore",function(e){
-            var vm_id =     $(this).closest("tr").find("input").val();
-            $(this).closest("tr").remove();
-        })
         
-        $("#removeAllSeleted").click(function(){
-            $("#vmselected tbody tr").remove();
-        })
+        // var interval;
+        // clearInterval(interval);
 
-        // SUBMIT form
-        $("#add_task").submit(function(e) {
-            e.preventDefault(); // avoid to execute the actual submit of the form.
-            var num_vms = parseInt($("[name='vm_id[]']").length) // controllo quante vm ho selezionato
-            var action = $(this).attr("action"); // the script where you handle the form input.
-            var postData = $(this).serialize()
-            if($("[name='componentName']").val().trim() == '' ){
-                alert("Inserisci il nome del componente")
-                $("[name='componentName']").focus()
-                return false
-            }else{
-                if(num_vms > 0){ // se ho selezionato almeno una vm
-                    $.post( action , postData , function( data ) {
-                        $( "#main" ).html( data );
-                    });
-                }else{ //se non ho selezionato nemmeno una vm
-                    alert("Devi selezionare almeno una VM!")
-                    return false
-                }
-            }
-            
+        // $(".hasTooltip").tooltip();
 
-            
-        });
+        // $("#vmselected").on("click",".restore",function(e){
+        //     var vm_id =     $(this).closest("tr").find("input").val();
+        //     $(this).closest("tr").remove();
+        // })
+        
+        // $("#removeAllSeleted").click(function(){
+        //     $("#vmselected tbody tr").remove();
+        // })
+
+        // // SUBMIT form
+        // $("#add_task").submit(function(e) {
+        //     e.preventDefault(); // avoid to execute the actual submit of the form.
+        //     var num_vms = parseInt($("[name='vm_id[]']").length) // controllo quante vm ho selezionato
+        //     var action = $(this).attr("action"); // the script where you handle the form input.
+        //     var postData = $(this).serialize()
+        //     if($("[name='componentName']").val().trim() == '' ){
+        //         alert("Inserisci il nome del componente")
+        //         $("[name='componentName']").focus()
+        //         return false
+        //     }else{
+        //         if(num_vms > 0){ // se ho selezionato almeno una vm
+        //             $.post( action , postData , function( data ) {
+        //                 $( "#main" ).html( data );
+        //             });
+        //         }else{ //se non ho selezionato nemmeno una vm
+        //             alert("Devi selezionare almeno una VM!")
+        //             return false
+        //         }
+        //     }
+        // });
         
 
 </script> 

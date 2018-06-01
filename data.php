@@ -16,14 +16,19 @@ class db
     }
 
     // method declaration
-    public function getProgetti() {
-        $query = "SELECT * FROM progetti";
+    public function getProgetti($idUtente=null) {
+        if ($idUtente == 1){
+            $query = "SELECT * FROM progetti";
+        }else{
+            $query = "SELECT * FROM progetti a WHERE find_in_set($idUtente,a.utente_id)";
+        }
+        $aResults = array();
         $result = $this->db->query($query);
         $i = 0;
         while($row = $result->fetch_assoc()) {
             $aResults[$i] = $row;
             $aResults[$i]['componenti'] = array();
-            $aResults[$i]['status'] = 'OK';
+            $aResults[$i]['status'] = $this->getComponentProjectStatus(null,$row["progetto_id"]);
             ### Recupero componenti per progetto
             $query2 = "SELECT * FROM componenti WHERE progetto_id=". $row["progetto_id"];	
             $result2 = $this->db->query($query2);
@@ -31,16 +36,15 @@ class db
             while($row2 = $result2->fetch_assoc()) {
                 $aResults[$i]['componenti'][$j] = $row2 ;
                 $aResults[$i]['componenti'][$j]['vms'] = array() ;
-                $status =  $this->getComponentStatus($row2['componente_id']);
-                $aResults[$i]['componenti'][$j]['status'] = $status;
+                $aResults[$i]['componenti'][$j]['status'] = $this->getComponentProjectStatus($row2['componente_id']);
                 
-                if( $status == 'warning' && $aResults[$i]['status'] != 'critical' ){
-                    $aResults[$i]['status'] = $status;
-                }else if ($status == 'critical'){
-                    $aResults[$i]['status'] = $status;
-                }else if ($status == 'OK' && $aResults[$i]['status'] != 'critical' && $aResults[$i]['status'] != 'warning'){
-                    $aResults[$i]['status'] = $status;
-                }
+                // if( $status == 'warning' && $aResults[$i]['status'] != 'critical' ){
+                //     $aResults[$i]['status'] = $status;
+                // }else if ($status == 'critical'){
+                //     $aResults[$i]['status'] = $status;
+                // }else if ($status == 'OK' && $aResults[$i]['status'] != 'critical' && $aResults[$i]['status'] != 'warning'){
+                //     $aResults[$i]['status'] = $status;
+                // }
                 
                 ### Recupero VM per componente
                 $aVMs = explode(",", $row2['vms_id']);
@@ -59,7 +63,7 @@ class db
         $aResults = array();
         $i=0;
         while($row = $result->fetch_assoc()) {
-            $row['status'] =  $this->getComponentStatus($row['componente_id']);
+            $row['status'] =  $this->getComponentProjectStatus($row['componente_id']);
             $aResults[$i] = $row ;
             $i++;
         }
@@ -142,9 +146,9 @@ class db
         $vms_id = (isset($data['vm_id']))? implode(',',$data['vm_id']) : '' ;
         $query = "INSERT INTO componenti (componente_nome, progetto_id, vms_id) VALUES ('$componente_nome', '$progetto_id', '$vms_id')";
         if ($this->db->query($query) === TRUE) {
-           return true;
+            return array( "OK" => $this->db->insert_id );
         } else {
-            return false ;
+            return array("error" => "Error Inserting record: " . $this->db->error) ;
         }
     }
     public function edit_component($data,$component_id){
@@ -156,14 +160,17 @@ class db
             vms_id = '$vms_id'
             WHERE componente_id = '$component_id'";
         if ($this->db->query($query) === TRUE) {
-           return true;
+           return array( "OK" => $component_id);
         } else {
-            return false ;
+            return array("error" => "Error Updating record: " . $this->db->error) ;
         }
     }
-    public function add_Project($data){
+    public function add_Project($data,$idUtente=null){
         $progetto_nome = $data['projectName'];
-        $query = "INSERT INTO progetti set progetto_nome='$progetto_nome'";
+        $query = "INSERT INTO progetti set progetto_nome='$progetto_nome' ";
+        if($idUtente){
+            $query .= ", utente_id='$idUtente'" ;
+        }
         if ($this->db->query($query) === TRUE) {
            return $this->db->insert_id;
         } else {
@@ -207,13 +214,23 @@ class db
              return false ;
          }
     }
-    public function getHistoryRequest($component_id=null){
+    public function getHistoryRequest($component_id=null,$idUtente){
         if($component_id){
             $query = "SELECT * FROM vmware.request where componente_id = '$component_id'";
         }else{
-            $query = "SELECT * FROM vmware.request"; 
+            if($idUtente == 1){
+                $query = "SELECT * FROM vmware.request";
+            }else{
+                $query = "SELECT a.* 
+                    FROM vmware.request a 
+                    LEFT JOIN componenti b ON a.componente_id= b.componente_id 
+                    LEFT JOIN progetti c on c.progetto_id=b.progetto_id   
+                    WHERE b.progetto_id is not null AND find_in_set($idUtente,c.utente_id)";
+            }
+             
         }
         
+       
         $result = $this->db->query($query);
         $requests = array();
         while($row = $result->fetch_object()) {
@@ -298,7 +315,18 @@ class db
         }
     }
 
-    public function getComponentStatus($component_id){
+    public function getVM4Component($component_id){
+        $vms=array();
+        $q="SELECT vms.* , vms_stats.* FROM vms   LEFT JOIN vms_stats ON vms.vm_id = vms_stats.vm_id 
+                WHERE find_in_set(vms.vm_id, ( SELECT vms_id FROM componenti WHERE componente_id = $component_id ) )";
+        $result = $this->db->query($q);
+        while($row = $result->fetch_object()) {
+            $vms[] = $row;
+        }
+        return $vms ;
+    }
+
+    public function getComponentProjectStatus($component_id=null,$project_id=null){
         $q='SELECT 
                 case 
                     when ( 
@@ -306,21 +334,24 @@ class db
                         max(mem_max_perc) BETWEEN (select mem_warning from soglie limit 1) AND (select mem_critical from soglie limit 1) OR
                         max(disk_max_io)  BETWEEN (select disk_warning from soglie limit 1) AND (select disk_critical from soglie limit 1) OR
                         max(net_max_io)   BETWEEN (select net_warning from soglie limit 1) AND (select net_critical from soglie limit 1) 
-                    ) then "warning"
+                    ) then "1"
                     when (
                         max(cpu_max_perc) > (select cpu_critical from soglie limit 1) OR 
                         max(mem_max_perc) > (select mem_critical from soglie limit 1) OR
                         max(disk_max_io)  > (select disk_critical from soglie limit 1) OR
                         max(net_max_io)   > (select net_critical from soglie limit 1) 
-                    ) then "critical" 
+                    ) then "2" 
                     else 
-                        "OK"
-                END as status
-                    
-            from vms_stats 
-            where componente_id = '.$component_id.'
-            group by componente_id
-            LIMIT 1';
+                        "0"
+                END as status      
+            FROM vms_stats ';
+
+            if(!$project_id){
+                $q .= 'WHERE componente_id = '.$component_id.' GROUP BY componente_id  LIMIT 1';
+            }elseif (!$component_id) {
+                $q .= 'WHERE progetto_id = '.$project_id.'  GROUP BY progetto_id  LIMIT 1';
+            }
+            
         $result = $this->db->query($q);
         if($result->num_rows){
             $row = $result->fetch_object();
@@ -328,7 +359,6 @@ class db
         }else{
             return '';
         }
-
     }
 
     public function login($username,$password){

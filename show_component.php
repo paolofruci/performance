@@ -46,9 +46,14 @@
 </div>
 <hr>
 
-<h6 class="text-muted" align="center">Performance Last hour Max value</h6> 
+<div class="d-flex justify-content-between">
+    
+<h6 class="text-muted" >Performance Last hour Max value </h6> 
+<h8 class="text-muted" >Last Update: <?=$component->lastupdate?> &nbsp;</h8> 
+</div>
 
-<table id="vms-componente" class="table table-sm" style='text-align:center;vertical-align:middle'>
+
+<table id="vms-componente" class="display" style='text-align:center;vertical-align:middle'>
     <thead class="">
         <tr>
             <th scope="col" class="d-none">#</th>
@@ -64,7 +69,7 @@
             <th>Net KBps</th>
         </tr>
     </thead>
-    <tbody>
+    <!-- <tbody>
         <?php 
             if(isset($component->vms)) :
                 foreach ($component->vms as $key => $oVM) : ?>
@@ -85,15 +90,15 @@
                     <td><?=$oVM->ip?></td>
                     <td><?=$oVM->ncpu?></td>
                     <td><?=$oVM->memorymb?></td>
-                    <td class="<?=$mydb->getStatusClassColor("mem",$oVM->mem_max_perc)?>"><?=$oVM->mem_max_perc?></td>
-                    <td class="<?=$mydb->getStatusClassColor("cpu",$oVM->cpu_max_perc)?>"> <?=$oVM->cpu_max_perc?> </td>
+                    <td class="<?=$mydb->getStatusClassColor("mem",$oVM-> mem_max_perc)?>"><?=$oVM->mem_max_perc?></td>
+                    <td class="<?=$mydb->getStatusClassColor("cpu",$oVM-> cpu_max_perc)?>"> <?=$oVM->cpu_max_perc?> </td>
                     <td class="<?=$mydb->getStatusClassColor("disk",$oVM->disk_max_io)?>"><?=$oVM->disk_max_io?></td> 
-                    <td class="<?=$mydb->getStatusClassColor("net",$oVM->net_max_io)?>"><?=$oVM->net_max_io?></td>
+                    <td class="<?=$mydb->getStatusClassColor("net",$oVM-> net_max_io)?>"><?=$oVM->net_max_io?></td>
                 </tr>
         <?php 
                 endforeach; 
             endif;?>
-    </tbody>
+    </tbody> -->
 </table>
 <hr>
 <h6 class="text-muted">Performance History</h6>
@@ -181,75 +186,79 @@
 
 
 <script>
-    $("input[name='schedule[checkemail]']").change( function() {
-        $("input[name='schedule[checkemailtext]']").attr('disabled',! $(this).is(":checked") ).focus()
-    })
-    $("#scheduleModal").on('show.bs.modal', function (event) {
-        var modal = $(this)
-        modal.find("input[name='schedule[checkemail]']").prop("checked",false)
-        modal.find("input[name='schedule[checkemailtext]']").val("").attr('disabled',true )
-        modal.find("select[name='schedule[type]']").val("")
-    })
 
-    $(".table-schedule").on("click",".deleteschedule",function(event){
-        var schedule_id = $(this).data("id")
-        event.preventDefault()
-        $.post( "save_schedule.php", { "deleteSchedule": 1 , "id_schedule": schedule_id } , function(data){
-            if(data=='OK'){
-                drawTableSchedule()
-            }else{
-                alert(data);
-            }
-        })
-    })
 
-    $(".btn-save-schedule").click( function(event){
-        event.preventDefault()
-        if( $("select[name='schedule[type]']").val().length == 0 ){
-            alert("Schedule Type required")
-            $("select[name='schedule[type]']").focus()
-        }else{
-            // alert("schedule type OK")
-            $("form[name=addScheduleForm]").submit() 
-        }
+    $(document).trigger("loadpage_show_component" , [<?=$id?>]);
+
+    // $("input[name='schedule[checkemail]']").change( function() {
+    //     $("input[name='schedule[checkemailtext]']").attr('disabled',! $(this).is(":checked") ).focus()
+    // })
+    // $("#scheduleModal").on('show.bs.modal', function (event) {
+    //     var modal = $(this)
+    //     modal.find("input[name='schedule[checkemail]']").prop("checked",false)
+    //     modal.find("input[name='schedule[checkemailtext]']").val("").attr('disabled',true )
+    //     modal.find("select[name='schedule[type]']").val("")
+    // })
+
+    // $(".table-schedule").on("click",".deleteschedule",function(event){
+    //     var schedule_id = $(this).data("id")
+    //     event.preventDefault()
+    //     $.post( "save_schedule.php", { "deleteSchedule": 1 , "id_schedule": schedule_id } , function(data){
+    //         if(data=='OK'){
+    //             drawTableSchedule()
+    //         }else{
+    //             alert(data);
+    //         }
+    //     })
+    // })
+
+    // $(".btn-save-schedule").click( function(event){
+    //     event.preventDefault()
+    //     if( $("select[name='schedule[type]']").val().length == 0 ){
+    //         alert("Schedule Type required")
+    //         $("select[name='schedule[type]']").focus()
+    //     }else{
+    //         // alert("schedule type OK")
+    //         $("form[name=addScheduleForm]").submit() 
+    //     }
         
-    })
+    // })
     
-    $("form[name=addScheduleForm]").submit(function(event){
-        event.preventDefault()
-        $.post( "save_schedule.php" , $(this).serializeArray() , function(data){
-            if(data=='OK'){
-                drawTableSchedule()
-            }else{
-                alert(data);
-            }
-        })
+    // $("form[name=addScheduleForm]").submit(function(event){
+    //     event.preventDefault()
+    //     $.post( "save_schedule.php" , $(this).serializeArray() , function(data){
+    //         if(data=='OK'){
+    //             drawTableSchedule()
+    //         }else{
+    //             alert(data);
+    //         }
+    //     })
         
-    })
+    // })
 
-    drawTableSchedule()
+    // drawTableSchedule()
 
-    function drawTableSchedule(){
-        $("table.table-schedule tbody").html('')
-        var id_component = "<?=$id?>"
-        $.getJSON("get_json_schedule.php?id_component=" + id_component , function(data){
-            if(data.length > 0){
-                $.each(data,function(k,v){
-                    $("table.table-schedule tbody").append("<tr> \
-                        <td></td> \
-                        <td></td> \
-                        <td>"+v.type+"</td> \
-                        <td>"+v.email+"</td> \
-                        <td><a class='deleteschedule' href='#' data-id='"+v.id+"' ><span class='oi oi-trash'></span></a></td> \
-                    </tr>")
-                })
-            }else{
-                $("table.table-schedule tbody").append("<tr> \
-                        <td colspan='5' class='table-warning'>Nessuna richiesta di performance Schedulata per questo componente</td> \
-                    </tr>")
-            }
-        })
-    }
+    // function drawTableSchedule(){
+    //     $("table.table-schedule tbody").html('')
+    //     var id_component = "<?=$id?>"
+    //     $.getJSON("get_json_schedule.php?id_component=" + id_component , function(data){
+    //         if(data.length > 0){
+    //             $.each(data,function(k,v){
+    //                 $("table.table-schedule tbody").append("<tr> \
+    //                     <td></td> \
+    //                     <td></td> \
+    //                     <td>"+v.type+"</td> \
+    //                     <td>"+v.email+"</td> \
+    //                     <td><a class='deleteschedule' href='#' data-id='"+v.id+"' ><span class='oi oi-trash'></span></a></td> \
+    //                 </tr>")
+    //             })
+    //         }else{
+    //             $("table.table-schedule tbody").append("<tr> \
+    //                     <td colspan='5' class='table-warning'>Nessuna richiesta di performance Schedulata per questo componente</td> \
+    //                 </tr>")
+    //         }
+    //     })
+    // }
 
 
 
@@ -283,9 +292,39 @@
     })
 
 
+    var table_vms_componente = $("#vms-componente").DataTable({
+        "dom": 't',
+        "ajax": {
+            url : 'get_json_vms_per_component.php',
+            data : { 'component_id' : "<?=$id?>" }
+        },
+        "columns": [
+            { "data": "vm_id" , className:"d-none vm_id"},
+            { "data": "vmname" , className: "vm_name" },
+            { "data": "powerstate" },
+            { "data": "badge" },
+            { "data": "ip" },
+            { "data": "ncpu" },
+            { "data": "memorymb" },
+            { "data": "mem_max_perc"},
+            { "data": "cpu_max_perc"},
+            { "data": "disk_max_io"},
+            { "data": "net_max_io"}
+        ],
+        // "columnDefs": [
+        //     { 
+        //         "targets": [7,8,9,10],
+        //         "render": function ( data, type, row ) {
+        //                     return "";
+        //                 }
+        //     }
+        // ],
+
+
+        "order": [[ 1, "desc" ]]
+    })
+
     var table = $('#Requests-history-comp').DataTable( {
-        // "processing": true,
-        // "serverSide": true,
         "ajax": {
             url : 'historyRequests.php',
             data : { 'component_id' : "<?=$id?>" }

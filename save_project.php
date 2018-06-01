@@ -1,4 +1,5 @@
 <?php 
+    session_start();
     include("data.php");
     $mydb = new db();
     $result = array();
@@ -10,7 +11,7 @@
             $result['output'] = $mydb->edit_Project($data);
             
         }else{
-            $result['output'] = $mydb->add_Project($data);
+            $result['output'] = $mydb->add_Project($data,$_SESSION['user']['userid']);
         }
     }else{
         $result['error'] = "non è stato specificato un nome progetto";

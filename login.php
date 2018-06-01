@@ -55,7 +55,11 @@ if(isset($_POST['username']) && isset($_POST['password']) && trim($_POST['passwo
             <div class="col-md-4 card shadow">
                 <div class="card-body">
                     <form action="login.php" class="form-signin" method="post">
-                        <h1 class="h3 mb-3 font-weight-normal">LOGIN</h1>
+                    <div class="d-flex justify-content-start">
+                    <img src='imgs/image.png' style='width:36px;height:36px';>
+                      <h1 class="h3 mb-3 font-weight-normal">VMs Performance Manager</h1>
+                                          
+                    </div>
                         <?php if($message) echo $message ?>
                         <label for="username" class="sr-only">Username</label>
                         <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus>

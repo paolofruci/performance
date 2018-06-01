@@ -26,7 +26,7 @@ $mydb = new db();
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-sm-3 col-md-2 mr-0 link2main" href="homepage.php">
-        <span class="oi oi-home"></span> LOTTOMATICA
+        <span class="oi oi-home"></span> &nbsp;LISTA PROGETTI
     </a>
     <input class="form-control form-control-dark w-100 mr-2" type="text" placeholder="Search" aria-label="Search">
     <span class="navbar-text text-nowrap">
@@ -81,7 +81,7 @@ $mydb = new db();
                 </button>
             </div>
             <div class="modal-body">
-                <form action="save_project.php">
+                <form id="form_save_project" action="save_project.php">
                     <div class="form-group">
                         <label for="recipient-name" class="col-form-label">Project Name:</label>
                         <input type='hidden' name='project-id' value='' />

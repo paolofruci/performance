@@ -45,7 +45,7 @@ foreach ($components as $key => $value) {
             </a>
             <div class="dropdown-divider"></div>
             <a href="edit_component.php?project_id=<?=$id?>" class="link2main dropdown-item">
-                Nuovo Componente
+                New Component
             </a>
         </div>
     </div>
@@ -57,14 +57,14 @@ foreach ($components as $key => $value) {
         <a href="show_component.php?id=<?=$component['componente_id']?>" 
             class="btn btn-light 
                 <?php 
-                    if($component['status'] == "warning") 
+                    if($component['status'] == "1") 
                         echo "btn-outline-warning" ;
-                    else if ($component['status'] == "critical") 
+                    else if ($component['status'] == "2") 
                         echo "btn-outline-danger"  ;   
                 ?> 
             m-2 p-2 link2main">
             <h5><?=$component['componente_nome']?></h5>
-            <small><?=count(explode(',',$component['vms_id']))?> Virtual Machines</small>
+            <small>Virtual Machines <?=count(explode(',',$component['vms_id']))?> </small>
         </a>
         <a href="#" 
             title="rimuovi componente"
