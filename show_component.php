@@ -36,7 +36,12 @@
         </div>
     </div>
     <div class="ml-auto">
-        <a href="new_request.php" class="btn btn-light btn-sm getPerformance" data-toggle="modal" data-target="#perfModal">
+        <a  href="new_request.php" class="btn btn-light btn-sm getPerformance" 
+            data-toggle="modal" 
+            data-target="#perfModal" 
+            data-action="newRequestperComponent"
+            data-returnto="show_component.php?id=<?=$id?>"
+            data-parentid="<?=$id?>">
             <span class="oi oi-bar-chart"></span> Get Performance
         </a>
         <a href="#" class="btn btn-light btn-sm getSchedule" id="dropdownschedulelink" data-toggle="modal" data-target="#scheduleModal">
@@ -47,9 +52,9 @@
 <hr>
 
 <div class="d-flex justify-content-between">
-    
-<h6 class="text-muted" >Performance Last hour Max value </h6> 
-<h8 class="text-muted" >Last Update: <?=$component->lastupdate?> &nbsp;</h8> 
+    <h6></h6>
+    <h6 class="text-muted" >Performance Last hour Max value </h6> 
+    <h8 class="text-muted" >Last Update: <?=$component->lastupdate?> &nbsp;</h8> 
 </div>
 
 
@@ -69,43 +74,11 @@
             <th>Net KBps</th>
         </tr>
     </thead>
-    <!-- <tbody>
-        <?php 
-            if(isset($component->vms)) :
-                foreach ($component->vms as $key => $oVM) : ?>
-                <tr>
-                    <td class="vm_id d-none"><?=$oVM->vm_id?></td>
-                    <td class="vm_name"><?=$oVM->vmname?></td>
-                    <td><?=$oVM->powerstate?></td>
-                    <td>
-                        <?php
-                         if ($oVM->badge == 'green') 
-                            echo '<span class="text-success oi oi-circle-check"></span>' ;
-                        elseif ($oVM->badge == 'yellow') 
-                            echo '<span class="text-warning oi oi-warning"></span>';
-                        elseif ($oVM->badge == 'red') 
-                            echo '<span class="text-danger oi oi-warning"></span>';
-                        ?>
-                    </td>
-                    <td><?=$oVM->ip?></td>
-                    <td><?=$oVM->ncpu?></td>
-                    <td><?=$oVM->memorymb?></td>
-                    <td class="<?=$mydb->getStatusClassColor("mem",$oVM-> mem_max_perc)?>"><?=$oVM->mem_max_perc?></td>
-                    <td class="<?=$mydb->getStatusClassColor("cpu",$oVM-> cpu_max_perc)?>"> <?=$oVM->cpu_max_perc?> </td>
-                    <td class="<?=$mydb->getStatusClassColor("disk",$oVM->disk_max_io)?>"><?=$oVM->disk_max_io?></td> 
-                    <td class="<?=$mydb->getStatusClassColor("net",$oVM-> net_max_io)?>"><?=$oVM->net_max_io?></td>
-                </tr>
-        <?php 
-                endforeach; 
-            endif;?>
-    </tbody> -->
 </table>
 <hr>
 <h6 class="text-muted">Performance History</h6>
 <div class="row">
-    <div class="col-sm-12" id="history-request">
-            
-    </div>
+    <div class="col-sm-12" id="history-request"></div>
 </div>
 <table id="Requests-history-comp" class="display" style="width:100%">
     <thead class="">
@@ -122,12 +95,12 @@
     </thead>
 </table>
 <!-- PERFORMANCE MODAL  -->
-<div id="perfModal" class="modal fade get-performance-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!-- <div id="perfModal" class="modal fade get-performance-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
         </div>
     </div>
-</div>
+</div> -->
 <!-- // PERFORMANCE MODAL  -->
 
 
@@ -190,108 +163,6 @@
 
     $(document).trigger("loadpage_show_component" , [<?=$id?>]);
 
-    // $("input[name='schedule[checkemail]']").change( function() {
-    //     $("input[name='schedule[checkemailtext]']").attr('disabled',! $(this).is(":checked") ).focus()
-    // })
-    // $("#scheduleModal").on('show.bs.modal', function (event) {
-    //     var modal = $(this)
-    //     modal.find("input[name='schedule[checkemail]']").prop("checked",false)
-    //     modal.find("input[name='schedule[checkemailtext]']").val("").attr('disabled',true )
-    //     modal.find("select[name='schedule[type]']").val("")
-    // })
-
-    // $(".table-schedule").on("click",".deleteschedule",function(event){
-    //     var schedule_id = $(this).data("id")
-    //     event.preventDefault()
-    //     $.post( "save_schedule.php", { "deleteSchedule": 1 , "id_schedule": schedule_id } , function(data){
-    //         if(data=='OK'){
-    //             drawTableSchedule()
-    //         }else{
-    //             alert(data);
-    //         }
-    //     })
-    // })
-
-    // $(".btn-save-schedule").click( function(event){
-    //     event.preventDefault()
-    //     if( $("select[name='schedule[type]']").val().length == 0 ){
-    //         alert("Schedule Type required")
-    //         $("select[name='schedule[type]']").focus()
-    //     }else{
-    //         // alert("schedule type OK")
-    //         $("form[name=addScheduleForm]").submit() 
-    //     }
-        
-    // })
-    
-    // $("form[name=addScheduleForm]").submit(function(event){
-    //     event.preventDefault()
-    //     $.post( "save_schedule.php" , $(this).serializeArray() , function(data){
-    //         if(data=='OK'){
-    //             drawTableSchedule()
-    //         }else{
-    //             alert(data);
-    //         }
-    //     })
-        
-    // })
-
-    // drawTableSchedule()
-
-    // function drawTableSchedule(){
-    //     $("table.table-schedule tbody").html('')
-    //     var id_component = "<?=$id?>"
-    //     $.getJSON("get_json_schedule.php?id_component=" + id_component , function(data){
-    //         if(data.length > 0){
-    //             $.each(data,function(k,v){
-    //                 $("table.table-schedule tbody").append("<tr> \
-    //                     <td></td> \
-    //                     <td></td> \
-    //                     <td>"+v.type+"</td> \
-    //                     <td>"+v.email+"</td> \
-    //                     <td><a class='deleteschedule' href='#' data-id='"+v.id+"' ><span class='oi oi-trash'></span></a></td> \
-    //                 </tr>")
-    //             })
-    //         }else{
-    //             $("table.table-schedule tbody").append("<tr> \
-    //                     <td colspan='5' class='table-warning'>Nessuna richiesta di performance Schedulata per questo componente</td> \
-    //                 </tr>")
-    //         }
-    //     })
-    // }
-
-
-
-
-
-
-    $('#perfModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget) // Button that triggered the modal
-        var href = button.attr('href')
-        var modal = $(this)
-        var data = {
-            "projectName": "<?=$component->progetto_nome?>" ,
-            "componentName" : "<?=$component->componente_nome?>",
-            "componentID" : <?=$component->componente_id?>
-        };
-        data["vms"] = [];
-        i=0
-        $("#vms-componente tbody tr").each(function(k,v){
-            data["vms"][i] = {};
-            data["vms"][i].id = $(v).find("td.vm_id").text()
-            data["vms"][i].name = $(v).find("td.vm_name").text()
-            i++
-        })
-        
-        $.post("new_request.php",data,function(result){
-            modal.find('.modal-content').html(result)
-        })
-    })
-    $('#perfModal').on('hidden.bs.modal', function (event) {
-        $("#main").load("show_component.php?id=<?=$id?>")
-    })
-
-
     var table_vms_componente = $("#vms-componente").DataTable({
         "dom": 't',
         "ajax": {
@@ -301,27 +172,63 @@
         "columns": [
             { "data": "vm_id" , className:"d-none vm_id"},
             { "data": "vmname" , className: "vm_name" },
-            { "data": "powerstate" },
-            { "data": "badge" },
+            { 
+                "data": "powerstate" ,  
+                "render" : function(data,type, row){
+                    if(data=='PoweredOff')
+                        return "<span class='text-muted'>"+data+"</span>";
+                    else
+                        return data;
+                }
+            },
+            { 
+                "data": "badge" ,
+                "render" : function(data,type, row){
+                    if(data){
+                         if (data == 'green'){
+                            if(row.powerstate == 'PoweredOff')
+                                return '<span style="color:#ccc" class="oi oi-circle-check"></span>'
+                            else
+                                return '<span class="text-success oi oi-circle-check"></span>' 
+                         }
+                        else if (data == 'yellow') 
+                            return '<span class="text-warning oi oi-warning"></span>'
+                        else if (data == 'red') 
+                            return '<span class="text-danger oi oi-warning"></span>'
+                    }else{
+                        return ""
+                    }
+                }    
+            },
             { "data": "ip" },
             { "data": "ncpu" },
             { "data": "memorymb" },
-            { "data": "mem_max_perc"},
-            { "data": "cpu_max_perc"},
-            { "data": "disk_max_io"},
-            { "data": "net_max_io"}
+            { 
+                "data": "mem_max_perc.value" , 
+                "createdCell": function (td, cellData, rowData, row, col) {
+                    $(td).addClass(rowData.mem_max_perc.className)
+                }
+            },
+            {   
+                "data": "cpu_max_perc.value",
+                "createdCell": function (td, cellData, rowData, row, col) {
+                    $(td).addClass(rowData.cpu_max_perc.className)
+                }
+            },
+            { 
+                "data": "disk_max_io.value",
+                "createdCell": function (td, cellData, rowData, row, col) {
+                    $(td).addClass(rowData.disk_max_io.className)
+                }
+            },
+            { 
+                "data": "net_max_io.value",
+                "createdCell": function (td, cellData, rowData, row, col) {
+                    $(td).addClass(rowData.net_max_io.className)
+                }
+            }    
         ],
-        // "columnDefs": [
-        //     { 
-        //         "targets": [7,8,9,10],
-        //         "render": function ( data, type, row ) {
-        //                     return "";
-        //                 }
-        //     }
-        // ],
-
-
-        "order": [[ 1, "desc" ]]
+        "order": [[ 1, "asc" ]]
     })
 
     var table = $('#Requests-history-comp').DataTable( {
@@ -332,12 +239,12 @@
         "columns": [
             { "data": "request_id" },
             { "data": "request_name" },
-            { "data": "start_time" },
-            { "data": "end_time" },
-            { "data": "interval_time" },
+            { "data": "start_time", orderable:false },
+            { "data": "end_time" ,  orderable:false  },
+            { "data": "interval_time", orderable:false },
             { "data": "type" },
-            { "data": "status" },
-            { "data": "request_id"}
+            { "data": "status",  orderable:false  },
+            { "data": "request_id" , orderable:false }
         ],
         "order": [[ 0, "desc" ]],
         "columnDefs": [
@@ -354,6 +261,7 @@
     clearInterval(interval);
     interval = setInterval( function () {
         table.ajax.reload(null, false);
+        table_vms_componente.ajax.reload(null, false);
     }, 10000 );
 
 

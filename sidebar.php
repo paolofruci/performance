@@ -6,11 +6,13 @@
 ?>
 
 <div class="sidebar-sticky">
+    <!-- <div class="d-flex flex-column"> -->
     <div>
         <!-- <h5 class="text-muted pl-2" style="line-height:1;margin-bottom:0">Saved Project </h5> -->
-        <a  href="#" class="ml-2 mt-1 btn btn-info btn-round btn-sm"  title="Nuovo Progetto" data-toggle="modal" data-target="#edit-prj-modal" style="line-height:1;font-family:verdana;font-style: oblique;">
-        Nuovo Progetto&nbsp; <span class="oi oi-plus"></span>
+        <a  href="#" class="ml-2  my-1 btn btn-info btn-round btn-sm"  title="Nuovo Progetto" data-toggle="modal" data-target="#edit-prj-modal" style="line-height:1;font-family:verdana;font-style: oblique;">
+        <span class="oi oi-plus"></span> &nbsp;Nuovo Progetto 
         </a>
+        <!-- <a  href="#" class="m-2 callpsajax">test ps ajax</a> -->
     </div>
 
     <ul class="nav flex-column mt-2">

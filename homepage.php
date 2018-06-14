@@ -72,37 +72,7 @@
         </table>
     </div>
 </div>
-<!-- PERFORMANCE MODAL  -->
-<div id="genericPerfModal" class="modal fade get-performance-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-        </div>
-    </div>
-</div>
-<!-- // PERFORMANCE MODAL  -->
 <script>
-
-    $('#genericPerfModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget) // Button that triggered the modal
-        var href = button.attr('href')
-        var modal = $(this)
-        var data = {
-            "projectName": "Performance" ,
-            "componentName" : "<?=rand(1000, 9999);?>",
-        };
-        data["vms"] = [];
-        
-        $.post("new_request.php",data,function(result){
-            modal.find('.modal-content').html(result)
-        })
-    })
-    $('#perfModal').on('hidden.bs.modal', function (event) {
-        $("#main").load("homepage.php")
-    })
-
-
-
-
     /* Request History table whit datatable */
     var table = $('#Requests-history-prj').DataTable( {
 

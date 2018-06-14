@@ -27,14 +27,14 @@
     <input type="hidden" name="component_id" value="<?=$_GET['component_id']?>" />
     <?php endif; ?>
 
-    <div class="d-flex align-items-start align-items-stretch">
+    <div class="d-flex flex-md-nowrap align-items-start align-items-stretch">
         
         <h4><?=$mydb->getProgettoName($_GET['project_id'])?></h4>
         
-        <div class="border-left ml-2 pl-2">
+        <div class="border-left ml-2 pl-2 w-50">
             <input type="text" 
                     name="componentName" 
-                    class="form-control form-control-sm" 
+                    class="form-control" 
                     id="inputComponentName" 
                     placeholder="Component Name"
                     value="<?=(isset($_GET['component_id']))? $component->componente_nome : ''  ?>"
@@ -94,45 +94,5 @@
     </div>
 </form>
 <script>
-        $(document).trigger("loadpage_edit_component" , [ <?=$_GET['project_id']?> , <?=$component_id?>] );
-
-
-        
-        // var interval;
-        // clearInterval(interval);
-
-        // $(".hasTooltip").tooltip();
-
-        // $("#vmselected").on("click",".restore",function(e){
-        //     var vm_id =     $(this).closest("tr").find("input").val();
-        //     $(this).closest("tr").remove();
-        // })
-        
-        // $("#removeAllSeleted").click(function(){
-        //     $("#vmselected tbody tr").remove();
-        // })
-
-        // // SUBMIT form
-        // $("#add_task").submit(function(e) {
-        //     e.preventDefault(); // avoid to execute the actual submit of the form.
-        //     var num_vms = parseInt($("[name='vm_id[]']").length) // controllo quante vm ho selezionato
-        //     var action = $(this).attr("action"); // the script where you handle the form input.
-        //     var postData = $(this).serialize()
-        //     if($("[name='componentName']").val().trim() == '' ){
-        //         alert("Inserisci il nome del componente")
-        //         $("[name='componentName']").focus()
-        //         return false
-        //     }else{
-        //         if(num_vms > 0){ // se ho selezionato almeno una vm
-        //             $.post( action , postData , function( data ) {
-        //                 $( "#main" ).html( data );
-        //             });
-        //         }else{ //se non ho selezionato nemmeno una vm
-        //             alert("Devi selezionare almeno una VM!")
-        //             return false
-        //         }
-        //     }
-        // });
-        
-
+        $(document).trigger("loadpage_edit_component" , [ <?=$_GET['project_id']?> , <?=$component_id?>] )   
 </script> 

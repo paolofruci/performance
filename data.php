@@ -132,8 +132,18 @@ class db
         return $this->db->query($q)->fetch_object() ;
     }
 
-    public function getAllVMs(){
-        $q = "SELECT * FROM vms";
+    public function getAllVMs($filter=null){
+        $q = "SELECT vms_stats.componente_id,
+                vms.vm_id,
+                vms.vmname,
+                vms.ip,
+                vms.vcenter,
+                vms_stats.powerstate 
+            FROM vms_stats LEFT JOIN vms ON vms.vm_id = vms_stats.vm_id ";
+        $vms = array();
+        if($filter && is_array($filter)){
+            $q .= " WHERE " . implode(" OR ",$filter)    ;
+        }
         $result = $this->db->query($q);
         while($row = $result->fetch_object()) {
             $vms[] = $row;
@@ -188,26 +198,9 @@ class db
         }
     }
     public function add_Request($data){
-        $progetto = $data['projectName'];
-        $componente = $data['componentName'];
-        $component_id = (isset($data['componentID']))? $data['componentID'] : '' ;
-        $requestName = $data['requestName'];
-        $aDateInterval = explode(' - ', $data['IntervalTime'] );
-        $now = date('d/m/Y H:i');
-        $startTime = $aDateInterval[0];
-        $endTime = $aDateInterval[1];
-        // $vmsName = implode(',',$data['vms_name']);
-        $aVmsID =  ( isset($data['vms_id']) ) ?  $data['vms_id'] : array();
-        $vmsID = implode(',',$aVmsID);
-        $aVmsName = array();
-        if(count($aVmsID) > 0){
-            foreach ($aVmsID as $key => $value) {
-                $aVmsName[] = $this->getVM($value)->vmname;
-            }
-        }
-        $vmsName = (count($aVmsName) > 0) ? implode(',',$aVmsName) :  '' ;
         $query = "INSERT INTO request (progetto, componente, vmname,vms_id,start_time,end_time,type,status,componente_id,request_name,request_date) 
-            VALUES ('$progetto','$componente','$vmsName','$vmsID','$startTime','$endTime','manual','Pending','$component_id','$requestName','$now')";
+            VALUES ('".$data['projectName']."','".$data['componentName']."','".$data['VmsNames']."','".$data['vmsID']."','".$data['startTime']."','".$data['endTime']."','manual','Pending','".$data['componentID']."','".$data['requestName']."','".date('d/m/Y H:i')."')";
+            
         if ($this->db->query($query) === TRUE) {
             return $this->db->insert_id;
          } else {
@@ -328,19 +321,19 @@ class db
 
     public function getComponentProjectStatus($component_id=null,$project_id=null){
         $q='SELECT 
-                case 
-                    when ( 
-                        max(cpu_max_perc) BETWEEN (select cpu_warning from soglie limit 1) AND (select cpu_critical from soglie limit 1) OR 
-                        max(mem_max_perc) BETWEEN (select mem_warning from soglie limit 1) AND (select mem_critical from soglie limit 1) OR
-                        max(disk_max_io)  BETWEEN (select disk_warning from soglie limit 1) AND (select disk_critical from soglie limit 1) OR
-                        max(net_max_io)   BETWEEN (select net_warning from soglie limit 1) AND (select net_critical from soglie limit 1) 
-                    ) then "1"
+                case
                     when (
                         max(cpu_max_perc) > (select cpu_critical from soglie limit 1) OR 
                         max(mem_max_perc) > (select mem_critical from soglie limit 1) OR
                         max(disk_max_io)  > (select disk_critical from soglie limit 1) OR
                         max(net_max_io)   > (select net_critical from soglie limit 1) 
                     ) then "2" 
+                    when ( 
+                        max(cpu_max_perc) BETWEEN (select cpu_warning from soglie limit 1) AND (select cpu_critical from soglie limit 1) OR 
+                        max(mem_max_perc) BETWEEN (select mem_warning from soglie limit 1) AND (select mem_critical from soglie limit 1) OR
+                        max(disk_max_io)  BETWEEN (select disk_warning from soglie limit 1) AND (select disk_critical from soglie limit 1) OR
+                        max(net_max_io)   BETWEEN (select net_warning from soglie limit 1) AND (select net_critical from soglie limit 1) 
+                    ) then "1"
                     else 
                         "0"
                 END as status      

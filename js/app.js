@@ -17,6 +17,7 @@
         $(".sidebar").load("sidebar.php",function(){
             $.each(id_projectOpened,function(k,v) {
                 $("#"+v).addClass("show")
+                $("[data-target='#"+v+"'] .oi").removeClass().addClass("oi oi-caret-bottom")
             })
             if(id_prjactive){
                 $("#"+id_prjactive).addClass("active")
@@ -239,8 +240,9 @@
     /*/SHOW COMPONENT PAGE */
 
     /* EDIT COMPONENT PAGE */
-        $(document).on("loadpage_edit_component", function(event,project_id,component_id=null){
+        $(document).on( "loadpage_edit_component", function( event, project_id, component_id ) {
             // Pulisco i reload a tempo
+            console.log(window.setInterval);
             var interval;
             clearInterval(interval);
 
@@ -285,5 +287,31 @@
         })
     /* /EDIT COMPONENT PAGE */
 
+
+    
+    /* SEARCH BAR */
+    $("#searchbar").livesearch();
+    /* /SEARCH BAR */
+
+
+    /* SHOW PERFORMANCE REQUEST POPUP */
+    $('#perfModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var returnTo = button.data("returnto");
+        var href = button.attr('href');
+        var modal = $(this);
+        var data = button.data();
+
+        modal.data("returnto",returnTo);
+          
+        $.post("new_request.php",data,function(result){
+            modal.find('.modal-content').html(result)
+        })
+    })
+    $('#perfModal').on('hidden.bs.modal', function (event) {
+        var returnTo = $(this).data("returnto");
+        $("#main").load(returnTo);
+    })
+    /* /SHOW PERFORMANCE REQUEST POPUP */
 
 })

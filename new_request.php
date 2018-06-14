@@ -1,3 +1,39 @@
+<?php
+    include("data.php");
+    $mydb = new db();
+
+    // STO RICHIEDENDO PERFORMANCE PER UN COMPONENTE
+    if( isset($_POST['action']) && $_POST['action'] == "newRequestperComponent" ){
+        if( isset($_POST['parentid']) ){
+            $component_id   = $_POST['parentid'] ;
+            $action = $_POST['action'];
+            $componentData  = $mydb->getComponent($component_id) ;
+            $component_name = $componentData->componente_nome ;
+            $project_id     = $componentData->progetto_id ;
+            $project_name   = $componentData->progetto_nome ;
+            $select_list    = array() ;
+            foreach ($componentData->vms as $key => $value) {
+                $select_list[$value->vm_id] = $value->vmname;
+            }
+        }
+    }
+    // STO RICHIEDENDO PERFORMANCE PER UN PROGETTO
+    elseif (isset($_POST['action']) && $_POST['action'] == "newRequestperProject") {
+        if( isset($_POST['parentid']) ){
+            $project_id = $_POST['parentid'] ;
+            $action = $_POST['action'];
+            $component_name = "COMPLETE" ;
+            $project_name   = $mydb->getProgettoName($project_id) ;
+            $component_id = null;
+            $select_list    = array() ;
+            foreach ($mydb->getProjectComponents($project_id) as $key => $value) {
+                $select_list[$value['componente_id']] = $value['componente_nome'] . " <small>(".count(explode(',',$value['vms_id'])) . " vms)</small>";
+            }
+        }
+    }
+?>
+
+
 <div class="modal-header">
     <h5 class="modal-title" id="exampleModalLabel">New Performance Request</h5>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -7,86 +43,40 @@
 <div class="modal-body">
     <div class="requestBody">
         <form id="add_request" action="save_request.php">
-            <?php if(isset($_POST['componentID'])) : ?>
-                <input type="hidden" name="componentID" value="<?=$_POST['componentID']?>" />
-            <?php endif ; ?>
-            <input type="hidden" name="componentName" value="<?=$_POST['componentName']?>" />
-            <input type="hidden" name="projectName" value="<?=$_POST['projectName']?>" />
-            <div class="row">
-                <div class="col-md-12">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><?=$_POST['projectName']?></li>
-                            <li class="breadcrumb-item active" aria-current="page"><?=$_POST['componentName']?></li>
-                        </ol>
-                    </nav>
+            <input type="hidden" name="action" value="<?=$action?>" />
+            <input type="hidden" name="componentID" value="<?=$component_id?>" />
+            <input type="hidden" name="componentName" value="<?=$component_name?>" />
+            <input type="hidden" name="projectName" value="<?=$project_name?>" />
+            <input type="hidden" name="projectID" value="<?=$project_id?>" />
+            <div class="form-group">
+                <label for="">Request Name</label>
+                <input type="text"  name="requestName" class="form-control" value="<?=$project_name." - ".$component_name?>" />
+            </div>
+            <div class="form-group">
+                <label for="">Interval</label>
+                <input type="text" readonly name="IntervalTime" class="datetime form-control"  required/>
+            </div>
+            <div class="form-group">
+                <?php foreach ($select_list as $key => $value) : ?>                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="select_list[]" value="<?=$key?>" id="Check<?=$key?>" checked />
+                    <label class="form-check-label" for="Check<?=$key?>">
+                        <?=$value?>
+                    </label>
                 </div>
+                <?php endforeach ?>
             </div>
-            <div class="form-row">      
-                <div class="form-group col-md-6">
-                    <label for="">Request Name</label>
-                    <input type="text"  name="requestName" class="form-control form-control-sm" value="<?=$_POST['projectName']?>_<?=$_POST['componentName']?>" />
-                </div>  
-            </div>
-            <div class="form-row">      
-                <div class="form-group col-md-6">
-                    <label for="">Interval</label>
-                    <input type="text" readonly name="IntervalTime" class="datetime form-control form-control-sm"  required/>
-                </div>  
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-12">
-                    <label for="">VM Selected</label>
-                    <div class="col-md-6">
-                        <table class="table table-sm">
-                            <?php if($_POST['projectName'] == 'Performance') : ?>
-                            <thead>
-                                <tr>
-                                    <th style="font-size: 11px">
-                                        VM Selezionate  
-                                    </th>
-                                    <th>
-                                        <a href="#" class="hasTooltip btn btn-light btn-sm" data-toggle="modal" data-target="#vm-modal" data-placement="top" title="Aggiungi VMs">
-                                            <span class="oi oi-plus"></span>
-                                        </a>
-                                        <a href="#" class="hasTooltip btn btn-light btn-sm" id="removeAllSeleted" data-placement="top" title="rimuovi tutto">
-                                            <span class="oi oi-x"></span>
-                                        </a>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <?php endif; ?>
-                            <tbody>
-                            <?php if(isset($_POST['vms'])) : ?>
-                                <?php foreach($_POST['vms'] as $key => $value) : ?>
-                                    <tr>
-                                        <td>
-                                            
-                                            <input type="checkbox" checked name="vms_id[]" value="<?=$value['id']?>" /> 
-                                            <!-- <input type="hidden" name="vms_name[]" value="<?=$value['name']?>" /> -->
-                                        </td>
-                                        <td>
-                                            <?=$value['name']?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach ?>
-                            <?php endif ?>
-                            </tbody>
-                        </table>     
-                    </div>
-                </div>
-            </div>
+            <!-- <pre>PERFORMANCE TEMPORANEAMENTE NON DISPONIBILI</pre> -->
         </form>
     </div>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-    <button type="button" id="submitButton" class="btn btn-primary">Send Request  </button>
+    <button type="button" id="requestSubmitButton" class="btn btn-primary">Send Request  </button>
 </div>
 
 <script>
-    // $('input.datetime').daterangepicker();
-    
+   
     var daterangepicker = $('input.datetime').daterangepicker({
         timePicker: true,
         timePicker24Hour:true,
@@ -117,28 +107,23 @@
 
 
         
-// SUBMIT form
-    $("#submitButton").click(function(){
-        if( $("[required]").val().length == 0 ){
-            $("[required]").focus()
-            alert("Interval required!")
-
+// SUBMIT Request Form
+    $("#requestSubmitButton").click(function(){
+        console.log($("input[required]").val().length)
+        if( $("input[required]").val().length == 0 ){
+            $("input[required]").focus();
+            alert("Interval required!");
         }else{
-            // alert("Interval OK")
             $("#add_request").submit();
-        }
-        
-    })
+        } 
+    });
     $("#add_request").submit(function(e) {
-        
-        var action = $(this).attr("action"); // the script where you handle the form input.
-        var postData = $(this).serialize()
+        e.preventDefault();
+        var action = $(this).attr("action") ;
+        var postData = $(this).serialize();
         $.post( action , postData , function( data ) {
             $( ".requestBody" ).html( data );
-            $("#submitButton").hide();
+            $("#requestSubmitButton").hide();
         });
-
-        e.preventDefault(); // avoid to execute the actual submit of the form.
     });
 </script>
-    <!-- dd/mm/YYYY HH:ii:ss -->

@@ -49,6 +49,16 @@ foreach ($components as $key => $value) {
             </a>
         </div>
     </div>
+    <div class="ml-auto">
+        <a  href="new_request.php" class="btn btn-light btn-sm getPerformance" 
+            data-toggle="modal" 
+            data-target="#perfModal" 
+            data-action="newRequestperProject"
+            data-returnto="show_project.php?id_project=<?=$id?>"
+            data-parentid="<?=$id?>">
+            <span class="oi oi-bar-chart"></span> Get Performance
+        </a>
+    </div>
 </div>
 <hr/>
 <div class="d-flex flex-wrap">

@@ -39,7 +39,7 @@
 <script type="text/javascript" src="DataTables/DataTables-1.10.16/js/dataTables.buttons.min.js"></script>
 <script type="text/javascript">
 var selected = {};
-var table = $('#vmsTable').DataTable( {
+var table_vms_all = $('#vmsTable').DataTable( {
         orderCellsTop : true,
         dom         : 'Bfrtip',
         processing  : true,
@@ -147,7 +147,7 @@ $('#vmsTable thead tr th.filter').each( function () {
 } );
   
 $( 'input', "#vmsTable thead th.filter" ).on( 'keyup change', function () {
-    table.ajax.reload();
+    table_vms_all.ajax.reload();
 } );
 
 </script>
